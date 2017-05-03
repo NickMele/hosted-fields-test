@@ -1,0 +1,11 @@
+{
+  "name": "hosted-fields-test",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "run": "cordova prepare && cordova run ios"
+  },
+  "author": "",
+  "license": "ISC"
+}

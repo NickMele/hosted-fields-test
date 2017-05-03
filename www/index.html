@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<!--
+    Licensed to the Apache Software Foundation (ASF) under one
+    or more contributor license agreements.  See the NOTICE file
+    distributed with this work for additional information
+    regarding copyright ownership.  The ASF licenses this file
+    to you under the Apache License, Version 2.0 (the
+    "License"); you may not use this file except in compliance
+    with the License.  You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing,
+    software distributed under the License is distributed on an
+    "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+     KIND, either express or implied.  See the License for the
+    specific language governing permissions and limitations
+    under the License.
+-->
+<html>
+    <head>
+        <!--
+        Customize this policy to fit your own app's needs. For more guidance, see:
+            https://github.com/apache/cordova-plugin-whitelist/blob/master/README.md#content-security-policy
+        Some notes:
+            * gap: is required only on iOS (when using UIWebView) and is needed for JS->native communication
+            * https://ssl.gstatic.com is required only on Android and is needed for TalkBack to function properly
+            * Disables use of inline scripts in order to mitigate risk of XSS vulnerabilities. To change this:
+                * Enable inline JS: add 'unsafe-inline' to default-src
+        -->
+        <meta http-equiv="Content-Security-Policy" content="default-src * gap://ready file: ws://* wss://*; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdnjs.cloudflare.com https://*.braintreegateway.com http://*.algolianet.com http://*.algolia.net https://braintreegateway.com http://localhost:*;">
+        <meta name="format-detection" content="telephone=no">
+        <meta name="msapplication-tap-highlight" content="no">
+        <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width">
+        <link rel="stylesheet" type="text/css" href="css/index.css">
+        <title>Hello World</title>
+    </head>
+    <body>
+      <iframe src="text.html" title="MyForm" width="300" height="300" scrolling="no" frameBorder="0"></iframe>
+
+      <hr/>
+
+      <form action="/" id="my-sample-form" method="post">
+        <label for="card-number">Card Number</label>
+        <div id="card-number"></div>
+
+        <label for="cvv">CVV</label>
+        <div id="cvv"></div>
+
+        <label for="expiration-date">Expiration Date</label>
+        <div id="expiration-date"></div>
+
+        <input type="submit" value="Pay" />
+      </form>
+
+      <script src="https://js.braintreegateway.com/web/3.14.0/js/client.min.js"></script>
+      <script src="https://js.braintreegateway.com/web/3.14.0/js/hosted-fields.min.js"></script>
+      <script>
+        var form = document.querySelector('#my-sample-form');
+        var submit = document.querySelector('input[type="submit"]');
+
+        braintree.client.create({
+          authorization: 'sandbox_g42y39zw_348pk9cgf3bgyw2b'
+        }, function (clientErr, clientInstance) {
+          if (clientErr) {
+            console.error(clientErr);
+            return;
+          }
+
+          console.log('client: ', clientInstance);
+
+          // This example shows Hosted Fields, but you can also use this
+          // client instance to create additional components here, such as
+          // PayPal or Data Collector.
+
+          braintree.hostedFields.create({
+            client: clientInstance,
+            styles: {
+              'input': {
+                'font-size': '14px'
+              },
+              'input.invalid': {
+                'color': 'red'
+              },
+              'input.valid': {
+                'color': 'green'
+              }
+            },
+            fields: {
+              number: {
+                selector: '#card-number',
+                placeholder: '4111 1111 1111 1111'
+              },
+              cvv: {
+                selector: '#cvv',
+                placeholder: '123'
+              },
+              expirationDate: {
+                selector: '#expiration-date',
+                placeholder: '10/2019'
+              }
+            }
+          }, function (hostedFieldsErr, hostedFieldsInstance) {
+            if (hostedFieldsErr) {
+              console.error(hostedFieldsErr);
+              return;
+            }
+
+            console.log('hosted fields: ', hostedFieldsInstance)
+
+            submit.removeAttribute('disabled');
+
+            form.addEventListener('submit', function (event) {
+              event.preventDefault();
+
+              hostedFieldsInstance.tokenize(function (tokenizeErr, payload) {
+                if (tokenizeErr) {
+                  console.error(tokenizeErr);
+                  return;
+                }
+
+                // If this was a real integration, this is where you would
+                // send the nonce to your server.
+                console.log('Got a nonce: ' + payload.nonce);
+              });
+            }, false);
+          });
+        });
+      </script>
+        <script type="text/javascript" src="cordova.js"></script>
+        <script type="text/javascript" src="js/index.js"></script>
+    </body>
+</html>
