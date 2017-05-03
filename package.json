@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "run": "cordova prepare && cordova run ios"
+    "start": "cordova prepare && cordova run ios"
   },
   "author": "",
   "license": "ISC"
